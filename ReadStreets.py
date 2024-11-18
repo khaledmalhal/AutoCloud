@@ -1,4 +1,6 @@
 import serial
+import sys
+sys.path.append('controller')
 from threading import Thread
 from Line_Tracking import *
 
