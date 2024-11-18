@@ -30,7 +30,7 @@ class RFIDTAG(str, Enum):
     NW = '41 205 254 41'
     S1 = '186 134 166 13'
     S2 = '78 95 166 137'
-    S3 = '255 014 167 13'
+    S3 = '255 014 167 137'
     S4 = '217 117 197 89'
     S5 = '137 40 167 137'
     S6 = '01 180 166 137'
@@ -49,6 +49,8 @@ class RFIDTAG(str, Enum):
     X4='222 75 02 149'
     X5='30 127 04 149'
 
-tagNames = RFIDTAG.__members__
-print(tagNames.keys())
-print(type(tagNames))
+tagNames = RFIDTAG.__members__.keys()
+print(tagNames)
+name = '30 127 04 149'
+tagNames.remove(name)
+print(RFIDTAG.name('30 127 04 149'))
