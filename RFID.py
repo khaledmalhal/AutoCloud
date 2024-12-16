@@ -53,4 +53,4 @@ tagNames = RFIDTAG.__members__.keys()
 print(tagNames)
 name = '30 127 04 149'
 tagNames.remove(name)
-print(RFIDTAG.name('30 127 04 149'))
+# print(RFIDTAG.name('30 127 04 149'))

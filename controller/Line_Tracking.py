@@ -41,10 +41,10 @@ class Line_Tracking:
 infrared=Line_Tracking()
 # Main program logic follows:
 if __name__ == '__main__':
-    print ('Program is starting ... ')
+    print('Program is starting ... ')
     try:
         infrared.run()
-    except KeyboardInterrupt:  # When 'Ctrl+C' is pressed, the child program  will be  executed.
+    except KeyboardInterrupt:  # When 'Ctrl+C' is pressed, the child program will be executed.
         PWM.setMotorModel(0,0,0,0)
         infrared.IR01_GPIO.close()
         infrared.IR02_GPIO.close()
