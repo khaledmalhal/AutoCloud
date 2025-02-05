@@ -6,13 +6,13 @@ class Adc:
         self.bus = smbus.SMBus(7)
         
         # I2C address of the device
-        self.ADDRESS            = 0x48
+        self.ADDRESS = 0x48
         
         # PCF8591 Command
-        self.PCF8591_CMD                        =0x40  #Command
+        self.PCF8591_CMD = 0x40  #Command
         
         # ADS7830 Command 
-        self.ADS7830_CMD                        = 0x84 # Single-Ended Inputs
+        self.ADS7830_CMD = 0x84 # Single-Ended Inputs
         
         for i in range(3):
             aa=self.bus.read_byte_data(self.ADDRESS,0xf4)

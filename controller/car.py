@@ -85,45 +85,46 @@ class Car(Device):
             try:
                 tagid = sensors.read_RFID()
                 print("id:", tagid)
-                if tagid != last_read_tagid:
-                    if is_valid_tag(tagid):  # Ver si existe en la lista de tags if l in ....
-                        end_time = time.time()
-                        elapsed_time = end_time - start_time
-                        start_time = end_time
-                        print("Valid tagid: " + tagid)
-                        # last_read_tagid = tagid
-                        try:
-                            self.__q.put(tagid)
-                        except Exception as e:
-                            print("E5{}".format(e))
-                        try:
-                            if self.digitaltwin_is_enabled() and tagid is not None:
-                                print('Update DT...')
-                                thingId = self.get_digitaltwin_id()  # 'edu.upc.craax:trafficlights'
-                                print(thingId + "tagId: " + tagid)
-                                print("!!!!! " + str(RFIDTAG(tagid)))
-                                distance = get_distance_between_tags(last_read_tagid, tagid)
-                                print(distance)
-                                print("Distance between " + str(RFIDTAG(last_read_tagid).name) + " and " + str(RFIDTAG(tagid).name) + ": " + str(
-                                    distance) + "cm")
-                                current_speed = distance / elapsed_time
-                                print("Current speed: " + str(current_speed) + " cm/s")
-                                # payload = '"' + str(RFIDTAG(self.__rfid_tag).name) + '"'
-                                payload = '{"tagid": "' + str(RFIDTAG(tagid).name) + '", "speed": ' + str(
-                                    current_speed) + ', "tstamp": '+str(time.time())+'}'
-                                print(payload)
-                                # endpoint = '/features/position/properties/tagid'
-                                endpoint = '/features/position/properties'
-                                # print(endpoint)
-                                print('Update ' + thingId + ' @' + endpoint)
-                                digitaltwin_update(thingId, endpoint, payload)
-                        except Exception as e:
-                            print("DT connection error {}".format(e))
+                if tagid == last_read_tagid:
+                    continue
+                if is_valid_tag(tagid):  # Ver si existe en la lista de tags if l in ....
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    start_time = end_time
+                    print("Valid tagid: " + tagid)
+                    # last_read_tagid = tagid
+                    try:
+                        self.__q.put(tagid)
+                    except Exception as e:
+                        print("E5{}".format(e))
+                    try:
+                        if self.digitaltwin_is_enabled() and tagid is not None:
+                            print('Update DT...')
+                            thingId = self.get_digitaltwin_id()  # 'edu.upc.craax:trafficlights'
+                            print(thingId + "tagId: " + tagid)
+                            print("!!!!! " + str(RFIDTAG(tagid)))
+                            distance = get_distance_between_tags(last_read_tagid, tagid)
+                            print(distance)
+                            print("Distance between " + str(RFIDTAG(last_read_tagid).name) + " and " + str(RFIDTAG(tagid).name) + ": " + str(
+                                distance) + "cm")
+                            current_speed = distance / elapsed_time
+                            print("Current speed: " + str(current_speed) + " cm/s")
+                            # payload = '"' + str(RFIDTAG(self.__rfid_tag).name) + '"'
+                            payload = '{"tagid": "' + str(RFIDTAG(tagid).name) + '", "speed": ' + str(
+                                current_speed) + ', "tstamp": '+str(time.time())+'}'
+                            print(payload)
+                            # endpoint = '/features/position/properties/tagid'
+                            endpoint = '/features/position/properties'
+                            # print(endpoint)
+                            print('Update ' + thingId + ' @' + endpoint)
+                            digitaltwin_update(thingId, endpoint, payload)
+                    except Exception as e:
+                        print("DT connection error {}".format(e))
 
-                        last_read_tagid = tagid
+                    last_read_tagid = tagid
 
-                    else:
-                        print("INVALID TAG: " + tagid)
+                else:
+                    print("INVALID TAG: " + tagid)
             except KeyboardInterrupt:
                 print("E6{}".format(e))
                 exit()
