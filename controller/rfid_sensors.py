@@ -7,7 +7,7 @@ class RFID_Sensors:
     def __init__(self):
         # self.bus = smbus.SMBus(1)
         self.arduino = serial.Serial(
-            '/dev/ttyACM0', baudrate=9600, timeout=0.1)
+            '/dev/ttyUSB0', baudrate=9600, timeout=0.1)
 
     def read_RFID(self):
         self.arduino.flushInput()
