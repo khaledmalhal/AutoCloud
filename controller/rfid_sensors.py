@@ -10,13 +10,15 @@ class RFID_Sensors:
             '/dev/ttyUSB0', baudrate=9600, timeout=0.1)
 
     def read_RFID(self):
-        self.arduino.flushInput()
-        while self.arduino.inWaiting() < 15:
-            pass
-        c = self.arduino.read(15)
-        text = c.decode()
-        return text.strip()
-
+        timeout = 0
+        max_timeout = 500
+        while self.arduino.in_waiting <= 0 and timeout < max_timeout:
+            timeout += 1
+        if timeout >= max_timeout:
+            return ''
+        ser_line = self.arduino.readline().decode('utf-8').rstrip()
+        card = ser_line.split(": ")[1]
+        return card
 '''
 if __name__ == '__main__':
     sensors = RFID_Sensors()
