@@ -39,7 +39,8 @@ class Adc:
         voltage = value1 / 256.0 * 3.3  #calculate the voltage value
         voltage = round(voltage,2)
         return voltage
-    def recvADS7830(self,channel):
+    
+    def readRawADS7830(self,channel):
         """Select the Command data from the given provided value above"""
         COMMAND_SET = self.ADS7830_CMD | ((((channel<<2)|(channel>>1))&0x07)<<4)
         self.bus.write_byte(self.ADDRESS,COMMAND_SET)
@@ -48,6 +49,9 @@ class Adc:
             value2 = self.bus.read_byte(self.ADDRESS)
             if value1==value2:
                 break;
+        return value1
+    def recvADS7830(self,channel):
+        value1  = self.readRawADS7830(channel)
         voltage = value1 / 255.0 * 3.3  #calculate the voltage value
         voltage = round(voltage,2)
         return voltage
