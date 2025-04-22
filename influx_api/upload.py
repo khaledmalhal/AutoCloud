@@ -1,5 +1,4 @@
 import os
-import sys
 from uuid import uuid4
 from influxdb_client import Authorization, InfluxDBClient, Permission, PermissionResource, Point, WriteOptions
 from influxdb_client.client.authorizations_api import AuthorizationsApi
@@ -12,12 +11,7 @@ from influxdb_client.domain.dialect import Dialect
 
 from dotenv import load_dotenv
 
-# from controller.sensors import Sensors
-# from influx_api.schema import Schema
-
-sys.path.append('../controller')
-from sensors import Sensors
-from schema import Schema
+from influx_api.schema import Schema
 
 class Influx:
     def __init__(self, name='nodevice'):
@@ -35,8 +29,11 @@ class Influx:
         self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
         self.query_api = self.client.query_api()
         self.schema = Schema()
-        self.schema.update_sensors()
-        self.schema.update_measurement()
+        print('Getting schema...')
+        sensors = self.schema.update_sensors()
+        measurements = self.schema.update_measurement()
+        if sensors is True and measurements is True:
+            print('Successfully obtained schema!')
 
     def upload_data(self, data: tuple[str, str]):
         try:
@@ -49,14 +46,3 @@ class Influx:
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
         except Exception as e:
             print("ERROR:{}".format(e))
-
-if __name__ == '__main__':
-    influx = Influx(name="autocloud1")
-    sensors = Sensors(name='autocloud1')
-    try:
-        while True:
-            key, value = sensors.read_line()
-            influx.upload_data((key, value))
-    except Exception as e:
-        print("Exception:{}".format(e))
-    # influx.get_schema()
