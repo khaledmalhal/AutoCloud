@@ -40,7 +40,7 @@ class Schema():
             raise TypeError(f'There is no data type in the schema for this measure ({measurement}).\n')
         
         data_type = measure['data_type']
-        if data_type == 'int'
+        if data_type == 'int':
             value = int(value)
         elif data_type == 'float':
             value = float(value)
@@ -63,7 +63,7 @@ class Schema():
         if measure is None:
             raise f'\nThere is no measurement {measurement} in the schema\n'
         data_type = measure['data_type']
-        if data_type == 'int'
+        if data_type == 'int':
             value = int(value)
         elif data_type == 'float':
             value = float(value)
