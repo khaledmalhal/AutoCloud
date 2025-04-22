@@ -1,6 +1,5 @@
 import os
 import requests
-import json
 
 from dotenv import load_dotenv
 
@@ -48,7 +47,8 @@ class Schema():
                 value = str(value)
             case _:
                 raise TypeError(f'There is no data type in the schema for this measure ({measurement}).\n')
-        return value
+        measure['value'] = value
+        return measure
 
     def parse_sensor_value(self, sensor, measurement, value):
         data  = self.sensors['data']
@@ -72,7 +72,8 @@ class Schema():
                 raise TypeError(f'There is no data type in the schema for this measure.\n'
                                 f'Measurement: {measure}'
                                 f'Sensor: {sensor_obj}')
-        return value
+        measure['value'] = value
+        return measure
 
 
 if __name__ == '__main__':
@@ -83,4 +84,4 @@ if __name__ == '__main__':
     old_value = '28.9'
     new_value = test.parse_measurement_value('temperature', old_value)
     print(f'old_value: {old_value}. Type: {type(old_value)}')
-    print(f'new_value: {new_value}. Type: {type(new_value)}')
+    print(f'new_value: {new_value}. Type: {type(new_value["value"])}')
