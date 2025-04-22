@@ -17,7 +17,7 @@ class Sensors:
 
 
 if __name__ == '__main__':
-    sensors = Sensors(name='autocloud-1')
+    sensors = Sensors(name='autocloud1')
     try:
         while True:
             sensors.read_line()
