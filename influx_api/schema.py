@@ -38,15 +38,16 @@ class Schema():
         measure = next((item for item in data if item['name'] == measurement), None)
         if measure is None:
             raise TypeError(f'There is no data type in the schema for this measure ({measurement}).\n')
-        match measure['data_type']:
-            case 'int':
-                value = int(value)
-            case 'float':
-                value = float(value)
-            case 'string':
-                value = str(value)
-            case _:
-                raise TypeError(f'There is no data type in the schema for this measure ({measurement}).\n')
+        
+        data_type = measure['data_type']
+        if data_type == 'int'
+            value = int(value)
+        elif data_type == 'float':
+            value = float(value)
+        elif data_type == 'string':
+            value = str(value)
+        else:
+            raise TypeError(f'There is no data type in the schema for this measure ({measurement}).\n')
         measure['value'] = value
         return measure
 
@@ -61,17 +62,17 @@ class Schema():
         measure = next((item for item in sensor_obj['sensor']['measurements'] if item['name'] == measurement), None)
         if measure is None:
             raise f'\nThere is no measurement {measurement} in the schema\n'
-        match measure['data_type']:
-            case 'int':
-                value = int(value)
-            case 'float':
-                value = float(value)
-            case 'string':
-                value = str(value)
-            case _:
-                raise TypeError(f'There is no data type in the schema for this measure.\n'
-                                f'Measurement: {measure}'
-                                f'Sensor: {sensor_obj}')
+        data_type = measure['data_type']
+        if data_type == 'int'
+            value = int(value)
+        elif data_type == 'float':
+            value = float(value)
+        elif data_type == 'string':
+            value = str(value)
+        else:
+            raise TypeError(f'There is no data type in the schema for this measure.\n'
+                            f'Measurement: {measure}'
+                            f'Sensor: {sensor_obj}')
         measure['value'] = value
         return measure
 
