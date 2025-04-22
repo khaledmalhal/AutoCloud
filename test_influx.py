@@ -1,4 +1,5 @@
 import os
+from time import sleep
 
 from controller.sensors import Sensors
 from influx_api.upload import Influx
@@ -28,5 +29,6 @@ if __name__ == '__main__':
                 if light != last_light:
                     last_light = light
                     influx.upload_data(('photoresistor', light))
+                sleep(1)
     except Exception as e:
         print("Exception:{}".format(e))

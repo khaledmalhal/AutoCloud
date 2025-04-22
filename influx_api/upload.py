@@ -44,5 +44,6 @@ class Influx:
 
             point = Point(measurement).tag("name", self.name).field(field, value)
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
+            print(f'Uploaded successfully {data}')
         except Exception as e:
             print("ERROR:{}".format(e))
