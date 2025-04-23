@@ -14,9 +14,12 @@ if __name__ == '__main__':
             print('I am parent')
             influx = Influx(name="autocloud1")
             sensors = Sensors(name='autocloud1')
+            last_CardUID = ""
             while True:
                 key, value = sensors.read_line()
-                influx.upload_data((key, value))
+                if key == "Card UID" and value != last_CardUID:
+                    last_CardUID = value
+                    influx.upload_data((key, value))
         else:           # Child process.
             print('I am child')
             influx = Influx(name="autocloud1")
