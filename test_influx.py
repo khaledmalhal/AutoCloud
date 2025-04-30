@@ -17,8 +17,13 @@ if __name__ == '__main__':
             last_CardUID = ""
             while True:
                 key, value = sensors.read_line()
-                if key == "Card UID" and value != last_CardUID:
-                    last_CardUID = value
+                upload_ready = True
+                if key == "Card UID":
+                    if value != last_CardUID:
+                        last_CardUID = value
+                    else:
+                        upload_ready = False
+                if upload_ready == True:
                     influx.upload_data((key, value))
         else:           # Child process.
             print('I am child')
