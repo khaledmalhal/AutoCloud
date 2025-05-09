@@ -3,8 +3,7 @@ import sys
 import datetime
 import signal
 
-sys.path.append('controller')
-from Line_Tracking import *
+from hardware.Line_Tracking import *
 from RFID import *
 
 class ReadStreets():

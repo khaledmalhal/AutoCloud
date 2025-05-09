@@ -1,7 +1,6 @@
 import time
 import sys
 
-sys.path.append('controller')
 # from Led import *
 # led=Led()
 
@@ -25,7 +24,7 @@ def test_Led():
 
         
         
-from Motor import *            
+from hardware.Motor import *
 PWM=Motor()          
 def test_Motor(): 
     try:
@@ -68,7 +67,7 @@ def test_Motor():
         print ("\nEnd of program")
 
 
-from Ultrasonic import *
+from hardware.Ultrasonic import *
 ultrasonic=Ultrasonic()                
 def test_Ultrasonic():
     try:
@@ -88,7 +87,7 @@ def car_Rotate():
     except KeyboardInterrupt:
         print ("\nEnd of program")
 
-from Line_Tracking import *
+from hardware.Line_Tracking import *
 line=Line_Tracking()
 def test_Infrared():
     try:
@@ -106,7 +105,7 @@ def test_Infrared():
         print ("\nEnd of program")
 
 
-from servo import *
+from hardware.servo import *
 pwm=Servo()
 def test_Servo():
     try:
@@ -129,7 +128,7 @@ def test_Servo():
         print ("\nEnd of program")
         
         
-from ADC import *
+from hardware.ADC import *
 adc=Adc()
 def test_Adc():
     try:
@@ -145,7 +144,7 @@ def test_Adc():
     except KeyboardInterrupt:
         print ("\nEnd of program")
 
-from Buzzer import *
+from hardware.Buzzer import *
 buzzer=Buzzer()
 def test_Buzzer():
     try:

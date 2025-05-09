@@ -1,10 +1,10 @@
 import os
 from time import sleep
 
-from controller.sensors import Sensors
+from hardware.sensors import Sensors
 from influx_api.upload import Influx
 
-from controller.ADC import Adc
+from hardware.ADC import Adc
 
 if __name__ == '__main__':
     pid_light = os.fork()

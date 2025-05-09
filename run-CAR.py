@@ -1,10 +1,6 @@
-import sys
-sys.path.append('controller')
-sys.path.append('testbed')
-
-import comminterface
-from car_FreeNove import CarPhy
-from ies_car_test import IESCar
+# from testbed.comminterface import *
+from hardware.car_FreeNove import CarPhy
+from hardware.ies_car_test import IESCar
 
 if __name__ == '__main__':
     ip       = '172.16.0.9'
