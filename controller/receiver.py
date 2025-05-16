@@ -1,9 +1,11 @@
 import socket
 from controller.messages import Messages
+from settings import Settings
 
 class Receiver():
-    def __init__(self, name: str):
-        self.name = name
+    def __init__(self, settings: Settings = None):
+        self.settings = settings
+        self.name = self.settings.get_name()
         self.msg = Messages()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)

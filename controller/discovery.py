@@ -7,15 +7,17 @@ from _thread import *
 from time import sleep
 from dotenv import load_dotenv
 from controller.messages import Messages
+from settings import Settings
 
 class Discovery:
-    def __init__(self, name='not_assigned'):
+    def __init__(self, settings: Settings = None):
         load_dotenv()
+        self.settings = settings
         self.msg = Messages()
-        self.name = name
+        self.name = self.settings.get_name()
         self.discover_msg = self.msg.discovery(self.name)
         self.edge_devices = []
-        self.api_url = os.getenv('API_HOST')+os.getenv('API_URL')
+        self.api_url = self.settings.get_api_url()
         self.obtain_devices_from_cloud()
         print(f"Obtained the following edge devices for this controller: {[ edge['name'] for edge in self.edge_devices ]}")
 
