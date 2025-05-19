@@ -24,7 +24,7 @@ class Receiver():
 
     def reply_controller(self, ip: str):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((ip, 5006))
+        sock.connect((ip, 5005))
         sock.sendall(self.msg.discovery_reply(self.name))
 
 if __name__ == '__main__':

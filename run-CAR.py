@@ -30,6 +30,7 @@ def discover(settings: Settings = None):
                 controller = data['controller']
                 print(f'[EdgeDevice] ->\tIP: {addr[0]}\tDiscovery type. Controller: {controller}')
                 receiver.reply_controller(addr[0])
+                settings.set_controller_ip(addr[0])
     else:
         # I am not the Edge. I am the Controller and I discover for Edge Devices.
         discovery = Discovery(settings)

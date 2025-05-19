@@ -22,7 +22,7 @@ class Discovery:
         print(f"Obtained the following edge devices for this controller: {[ edge['name'] for edge in self.edge_devices ]}")
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(('', 5006))
+        self.sock.bind(('', 5005))
         self.sock.listen(1)
         start_new_thread(self.listen_reply, ())
 

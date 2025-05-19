@@ -25,7 +25,7 @@ def test_Led():
         
         
 from hardware.Motor import *
-PWM=Motor()          
+PWM=Motor()
 def test_Motor(): 
     try:
         PWM.setMotorModel(1000,1000,1000,1000)         #Forward
@@ -68,7 +68,7 @@ def test_Motor():
 
 
 from hardware.Ultrasonic import *
-ultrasonic=Ultrasonic()                
+ultrasonic=Ultrasonic()
 def test_Ultrasonic():
     try:
         while True:
@@ -121,7 +121,7 @@ def test_Servo():
                 time.sleep(0.01)
             for i in range(150,80,-1):
                 pwm.setServoPwm('1',i)
-                time.sleep(0.01)   
+                time.sleep(0.01)
     except KeyboardInterrupt:
         pwm.setServoPwm('0',90)
         pwm.setServoPwm('1',90)
