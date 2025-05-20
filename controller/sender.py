@@ -7,10 +7,10 @@ class Sender():
         self.settings = settings
         self.msg = Messages()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.set_socket_bind()
+        self.connect_socket()
         print("Ready to send sensor data!")
 
-    def set_socket_bind(self):
+    def connect_socket(self):
         self.sock.connect((self.settings.get_controller_ip(), 5006))
 
     def send_sensor_data(self, data: tuple):

@@ -50,15 +50,16 @@ class Forward():
     def listen_data(self):
         while True:
             conn, addr = self.sock.accept()
-            data = conn.recv(1024)
-            conn.close()
             pid = os.fork()
             if pid == 0:
-                # Create a child to do the uploading job.
-                # The parent will continue to read.
-                try:
-                    ret = eval(data.decode('utf-8'))
-                    self.parse_edge_msg(ret, addr)
-                    sys.exit(0)
-                except Exception as e:
-                    print(f"\nNot possible to parse message from edge: {e}\nData: {data}.\n")
+                # Create a child that has the open socket with the Edge Device
+                # and the parent will continue to read accept new sockets.
+                while True:
+                    data = conn.recv(1024)
+                    try:
+                        ret = eval(data.decode('utf-8'))
+                        self.parse_edge_msg(ret, addr)
+                    except Exception as e:
+                        print(f"\nNot possible to parse message from edge: {e}\nData: {data}.\n")
+                        conn.close()
+                        sys.exit(1)

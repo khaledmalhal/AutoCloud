@@ -36,7 +36,7 @@ def discover(settings: Settings = None):
             data, addr = receiver.receive()
             if data['type'] == receiver.msg.DISCOVERY:
                 controller = data['controller']
-                print(f'[EdgeDevice] ->\tIP: {addr[0]}\tDiscovery type. Controller: {controller}')
+                # print(f'[EdgeDevice] ->\tIP: {addr[0]}\tDiscovery type. Controller: {controller}')
                 try:
                     ret = receiver.reply_controller(addr[0])
                     if ret is None:
@@ -79,9 +79,20 @@ def read_sensor(settings: Settings = None):
             # Parent. Not light.
             sender = Sender(settings)
             sensors = Sensors(name=settings.get_name())
+            last_CardUID = ""
+            upload_ready = True
             while True:
                 key, value = sensors.read_line()
-                sender.send_sensor_data((key, value))
+                if key == "Card UID":
+                    if value != last_CardUID:
+                        last_CardUID = value
+                        upload_ready = True
+                    else:
+                        upload_ready = False
+                else:
+                    upload_ready = True
+                if upload_ready == True:
+                    sender.send_sensor_data((key, value))
         else:
             # Child process.
             sender = Sender(settings)
