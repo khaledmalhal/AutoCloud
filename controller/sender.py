@@ -10,5 +10,5 @@ class Sender():
         print("Ready to send sensor data!")
 
     def send_sensor_data(self, data: tuple[str, str]):
-        self.sock.connect((self.settings.controller_ip, 5006))
+        self.sock.connect((self.settings.get_controller_ip(), 5006))
         self.sock.sendall(self.msg.sensor_data(data[0], data[1]))
