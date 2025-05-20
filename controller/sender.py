@@ -14,4 +14,7 @@ class Sender():
         self.sock.connect((self.settings.get_controller_ip(), 5006))
 
     def send_sensor_data(self, data: tuple):
-        self.sock.sendall(self.msg.sensor_data(data[0], str(data[1])))
+        key = data[0]
+        value = str(data[1])
+        edgedevice = self.settings.get_name()
+        self.sock.sendall(self.msg.sensor_data(key, value, edgedevice))

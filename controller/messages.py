@@ -18,9 +18,10 @@ class Messages():
             "type": self.DISCOVERY_REPLY,
             "edgedevice": name
         }).encode('utf-8')
-    def sensor_data(self, key: str, value: str):
+    def sensor_data(self, key: str, value: str, edgedevice: str):
         return str({
             "type": self.SENSOR_DATA,
             "key": key,
-            "value": value
+            "value": value,
+            "edgedevice": edgedevice
         }).encode('utf-8')

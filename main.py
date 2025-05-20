@@ -93,6 +93,7 @@ def read_sensor(settings: Settings = None):
                     upload_ready = True
                 if upload_ready == True:
                     sender.send_sensor_data((key, value))
+                    sleep(0.5)
         else:
             # Child process.
             sender = Sender(settings)

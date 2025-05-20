@@ -18,7 +18,7 @@ class Forward():
         self.sock.listen(1)
         start_new_thread(self.listen_data, ())
 
-    def upload_sensor_data(self, key: str, value: str):
+    def upload_sensor_data(self, key: str, value: str, from_edge: str):
         """
         Here, we do any pre-processing if needed for the data.
         For example, we don't send the same read Card UID, otherwise we will saturate the DB.
@@ -31,7 +31,7 @@ class Forward():
                 upload_ready = False
         if upload_ready == True:
             try:
-                self.influx.upload_data((key, value))
+                self.influx.upload_data((key, value), from_edge)
             except Exception as e:
                 print(f'Error uploading data to InfluxDB:\n\t->{e}')
 
@@ -42,9 +42,10 @@ class Forward():
         reply_type = data['type']
         if reply_type == self.msg.SENSOR_DATA:
             keys = data.keys()
-            if 'key' in keys and 'value' in keys:
+            if 'key' in keys and 'value' in keys and 'edgedevice' in keys:
                 key = data['key']
                 value = data['value']
+                edgedevice = data['edgedevice']
                 self.upload_sensor_data(key, value)
 
     def listen_data(self):
