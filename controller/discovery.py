@@ -21,6 +21,7 @@ class Discovery:
         self.obtain_devices_from_cloud()
         print(f"Obtained the following edge devices for this controller: {[ edge['name'] for edge in self.edge_devices ]}")
 
+        # TCP Socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind(('', 5005))
         self.sock.listen(1)

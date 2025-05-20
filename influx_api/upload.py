@@ -1,5 +1,6 @@
 import os
 from uuid import uuid4
+import threading
 from influxdb_client import Authorization, InfluxDBClient, Permission, PermissionResource, Point, WriteOptions
 from influxdb_client.client.authorizations_api import AuthorizationsApi
 from influxdb_client.client.bucket_api import BucketsApi
@@ -30,10 +31,16 @@ class Influx:
         self.query_api = self.client.query_api()
         self.schema = Schema()
         print('Getting schema...')
+        self.update_schema()        
+        
+    def update_schema(self):
         sensors = self.schema.update_sensors()
         measurements = self.schema.update_measurement()
         if sensors is True and measurements is True:
             print('Successfully obtained schema!')
+        else:
+            print('There has been an error getting schema.')
+        threading.Timer(10, self.update_schema).start()
 
     def upload_data(self, data: tuple[str, str]):
         try:

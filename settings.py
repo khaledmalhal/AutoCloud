@@ -32,6 +32,8 @@ class Settings():
                 INFLUX_URL:    The URL of where the InfluxDB is hosted. You should also include the port if necessary.
             """
             )
+        self._controller_ip = ""
+
     def get_im_edge(self):
         return self._im_edge
     def set_im_edge(self, value):
@@ -86,6 +88,12 @@ class Settings():
         if self._dns_port != value:
             self._dns_port = value
 
+    def get_controller_ip(self):
+        return self._controller_ip
+    def set_controller_ip(self, value):
+        if self._controller_ip != value:
+            self._controller_ip = value
+
     im_edge       = property(get_im_edge, set_im_edge)
     name          = property(get_name, set_name)
     api_url       = property(get_api_url, set_api_url)
@@ -95,6 +103,7 @@ class Settings():
     influx_url    = property(get_influx_url, set_influx_url)
     dns_ip        = property(get_dns_ip, set_dns_ip)
     dns_port      = property(get_dns_port, set_dns_port)
+    controller_ip = property(get_controller_ip, set_controller_ip)
 
     def to_dict(self) -> dict:
         return {
@@ -106,7 +115,8 @@ class Settings():
             'influx_org':    self.influx_org,
             'influx_url':    self.influx_url,
             'dns_ip':   self.dns_ip,
-            'dns_port': self.dns_port
+            'dns_port': self.dns_port,
+            'controller_ip': self.controller_ip
         }
 
     def get_properties(self):
