@@ -13,15 +13,17 @@ from influxdb_client.domain.dialect import Dialect
 from dotenv import load_dotenv
 
 from influx_api.schema import Schema
+from settings import Settings
 
 class Influx:
-    def __init__(self, name='nodevice'):
+    def __init__(self, settings: Settings = None):
         load_dotenv()
-        self.name = name
-        self.bucket = os.getenv("INFLUX_BUCKET")
-        self.token  = os.getenv("INFLUX_TOKEN")
-        self.org    = os.getenv("INFLUX_ORG")
-        self.url    = os.getenv("INFLUX_URL")
+        self.settings = settings
+        self.name   = settings.get_name()
+        self.bucket = settings.get_influx_bucket()
+        self.token  = settings.get_influx_token()
+        self.org    = settings.get_influx_org()
+        self.url    = settings.get_influx_url()
         self.client = InfluxDBClient(
             url   = self.url,
             token = self.token,
@@ -29,7 +31,7 @@ class Influx:
         )
         self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
         self.query_api = self.client.query_api()
-        self.schema = Schema()
+        self.schema = Schema(settings)
         print('Getting schema...')
         self.update_schema()        
         

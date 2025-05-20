@@ -17,7 +17,7 @@ from hardware.ADC import Adc
 from controller.discovery import Discovery
 from controller.receiver import Receiver
 from controller.sender import Sender
-from controller.retransmit import Retransmit
+from controller.forward import Forward
 from settings import Settings
 
 def close_port(port):
@@ -48,6 +48,7 @@ def discover(settings: Settings = None):
     else:
         # I am not the Edge. I am the Controller and I discover for Edge Devices.
         discovery = Discovery(settings)
+        forward = Forward(settings)
         while True:
             discovery.discover_edge_devices()
             sleep(2)

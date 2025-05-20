@@ -23,4 +23,4 @@ class Messages():
             "type": self.SENSOR_DATA,
             "key": key,
             "value": value
-        })
+        }).encode('utf-8')

@@ -2,17 +2,18 @@ import os
 import requests
 
 from dotenv import load_dotenv
+from settings import Settings
 
 class Schema():
-    def __init__(self):
+    def __init__(self, settings: Settings = None):
         load_dotenv()
-        self.api_host = os.getenv("API_HOST")
-        self.api_url  = os.getenv("API_URL")
+        self.settings = settings
+        self.api_url  = settings.get_api_url()
         self.sensors = []
         self.measurements = []
 
     def update_measurement(self):
-        result = requests.get(self.api_host+self.api_url+"/measurement")
+        result = requests.get(self.api_url+"/measurement")
         if result.status_code == 200:
             self.measurements = result.json()
             return True
@@ -22,7 +23,7 @@ class Schema():
                         f'-> Details: {result.text}\n')
 
     def update_sensors(self):
-        result = requests.get(self.api_host+self.api_url+"/sensor/sensor_full")
+        result = requests.get(self.api_url+"/sensor/sensor_full")
         if result.status_code == 200:
             self.sensors = result.json()
             return True

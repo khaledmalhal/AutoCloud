@@ -6,18 +6,18 @@ from settings import Settings
 from controller.messages import Messages
 from influx_api.upload import Influx
 
-class Retransmit():
+class Forward():
     def __init__(self, settings: Settings = None):
-        self.influx = Influx(settings.get_name())
+        self.influx = Influx(settings)
         self.msg = Messages()
         self.last_CardUID = ""
 
         # TCP Socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(('', 5006))
+        self.sock.bind(('0.0.0.0', 5006))
         self.sock.listen(1)
         start_new_thread(self.listen_data, ())
-    
+
     def parse_sensor_data(self, key: str, value: str):
         """
         Here, we do any pre-processing if needed for the data.
