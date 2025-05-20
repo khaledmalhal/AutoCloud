@@ -2,9 +2,11 @@ import json
 
 class Messages():
     # Literals
-    DISCOVERY       = "discovery"
-    DISCOVERY_REPLY = "discovery_reply"
-    SENSOR_DATA     = "sensor_data"
+    DISCOVERY        = "discovery"
+    DISCOVERY_REPLY  = "discovery_reply"
+    SENSOR_DATA      = "sensor_data"
+    CLOUD_PING       = "cloud_ping"
+    CLOUD_PING_REPLY = "cloud_ping_reply"
 
     def __init__(self):
         pass
@@ -24,4 +26,13 @@ class Messages():
             "key": key,
             "value": value,
             "edgedevice": edgedevice
+        }).encode('utf-8')
+    def cloud_ping(self, name: str):
+        return str({
+            "type": self.CLOUD_PING,
+            "controller": name
+        }).encode('utf-8')
+    def cloud_ping_reply(self):
+        return str({
+            "type": self.CLOUD_PING_REPLY
         }).encode('utf-8')

@@ -123,6 +123,7 @@ if __name__ == '__main__':
     try:
         close_port(5005)
         close_port(5006)
+        close_port(5007)
         sleep(1)
     except:
         print("No processes needed to be closed")

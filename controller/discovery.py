@@ -21,11 +21,17 @@ class Discovery:
         self.obtain_devices_from_cloud()
         print(f"Obtained the following edge devices for this controller: {[ edge['name'] for edge in self.edge_devices ]}")
 
-        # TCP Socket
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(('', 5005))
-        self.sock.listen(1)
+        # TCP Socket for Edge-Controller communication
+        self.sock_edge = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock_edge.bind(('', 5005))
+        self.sock_edge.listen(1)
+
+        # TCP Socket for Controller-Cloud communication
+        self.sock_cloud = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock_cloud.connect(('10.0.0.49', 5007))
+
         start_new_thread(self.listen_reply, ())
+        start_new_thread(self.ping_cloud, ())
 
     def obtain_devices_from_cloud(self):
         ret = requests.get(f'{self.api_url}/controller/{self.name}')
@@ -75,9 +81,24 @@ class Discovery:
             sock.sendto(self.discover_msg, ("255.255.255.255", 5005))
             sock.close()
 
+    def parse_cloud_msg(self, data: dict, conn: socket.socket, addr: tuple):
+        msg_type = data['type']
+        print(msg_type)
+        if msg_type == self.msg.CLOUD_PING_REPLY:
+            pass
+
+    def ping_cloud(self):
+        while True:
+            try:
+                self.sock_cloud.sendall(self.msg.cloud_ping(self.settings.get_name()))
+            except Exception as e:
+                print(f"\nNot possible to parse message from Cloud: {e}\n")
+            sleep(10)
+
+
     def listen_reply(self):
         while True:
-            conn, addr = self.sock.accept()
+            conn, addr = self.sock_edge.accept()
             data = conn.recv(1024)
             try:
                 ret = eval(data.decode('utf-8'))
