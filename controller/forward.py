@@ -46,7 +46,7 @@ class Forward():
                 key = data['key']
                 value = data['value']
                 edgedevice = data['edgedevice']
-                self.upload_sensor_data(key, value)
+                self.upload_sensor_data(key, value, edgedevice)
 
     def listen_data(self):
         while True:

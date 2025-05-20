@@ -14,7 +14,7 @@ class Receiver():
 
     def receive(self):
         data, addr = self.sock.recvfrom(1024)
-        print(f'Received from {addr}: {data}')
+        # print(f'Received from {addr}: {data}')
         try:
             ret = eval(data.decode('utf-8'))
             return (ret, addr)
