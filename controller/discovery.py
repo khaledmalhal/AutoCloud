@@ -67,7 +67,7 @@ class Discovery:
 
     def discover_edge_devices(self):
         ips = self.get_interfaces_IPs()
-        print(f'[Controller] -> Sending discovery message on {ips}')
+        # print(f'[Controller] -> Sending discovery message on {ips}')
         for ip in ips:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)  # UDP
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -97,7 +97,7 @@ class Discovery:
             edge['IP'] = addr[0]
             edge['controller'] = self.name
             self.update_edge(edge['name'])
-            print(self.edge_devices)
+            # print(self.edge_devices)
 
 
 if __name__ == '__main__':

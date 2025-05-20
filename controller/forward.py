@@ -18,7 +18,7 @@ class Forward():
         self.sock.listen(1)
         start_new_thread(self.listen_data, ())
 
-    def parse_sensor_data(self, key: str, value: str):
+    def upload_sensor_data(self, key: str, value: str):
         """
         Here, we do any pre-processing if needed for the data.
         For example, we don't send the same read Card UID, otherwise we will saturate the DB.
@@ -45,7 +45,7 @@ class Forward():
             if 'key' in keys and 'value' in keys:
                 key = data['key']
                 value = data['value']
-                self.parse_edge_msg(key, value)
+                self.upload_sensor_data(key, value)
 
     def listen_data(self):
         while True:
