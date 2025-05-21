@@ -1,5 +1,5 @@
 from settings import Settings
-from messages import Messages
+from controller.messages import Messages
 
 class CommandExec():
     def __init__(self, settings: Settings = None):
