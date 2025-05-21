@@ -1,6 +1,8 @@
 import socket
+from _thread import *
 from ping3 import ping
 from controller.messages import Messages
+from controller.commandExec import CommandExec
 from settings import Settings
 
 class Receiver():
@@ -8,22 +10,26 @@ class Receiver():
         self.settings = settings
         self.name = self.settings.get_name()
         self.msg = Messages()
+        self.executer = CommandExec(settings)
+
         self.discovery_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.discovery_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.discovery_sock.bind(('0.0.0.0', 5005))
 
         self.controller_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.controller_sock.bind(('0.0.0.0', 5006))
+        start_new_thread(self.receive_commands, ())
         print("Ready to receive!")
 
     def receive_commands(self):
-        data, addr = self.controller_sock.recvfrom(4096)
-        try:
-            ret = eval(data.decode('utf-8'))
-            return (ret, addr)
-        except Exception as e:
-            print(f'Not possible to parse command from controller: {e}\nData: {data}.\n')
-            return (data, addr)
+        while True:
+            data, addr = self.controller_sock.recvfrom(4096)
+            try:
+                ret = eval(data.decode('utf-8'))
+                self.executer.execute(ret)
+            except Exception as e:
+                print(f'Not possible to parse command from controller: {e}\nData: {data}.\n')
+                return (data, addr)
 
     def ping_ip(self, ip: str) -> bool:
         ret = ping(ip, timeout=2)
