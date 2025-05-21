@@ -72,7 +72,7 @@ class Receiver():
                 return True
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect((addr, 5005))
+                sock.connect((addr[0], 5005))
                 self.settings.set_controller_ip(addr[0])
                 ret = sock.sendall(self.msg.discovery_reply(self.name))
                 return ret is True
