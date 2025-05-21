@@ -64,7 +64,7 @@ class Receiver():
             return False
 
     def reply_controller(self, data: dict, addr: tuple):
-        if data['type'] == receiver.msg.DISCOVERY:
+        if data['type'] == self.msg.DISCOVERY:
             controller = self.settings.get_controller_ip()
             if self.validate_controller(controller, addr[0]) is True:
                 # If the Controller we know is valid, then we don't have to reply.
