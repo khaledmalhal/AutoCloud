@@ -2,7 +2,7 @@ import os
 import sys
 import psutil
 import socket
-import pyping
+from ping3 import ping
 from time import sleep
 import multiprocessing
 from multiprocessing import Process, Manager
@@ -19,6 +19,7 @@ from controller.discovery import Discovery
 from controller.receiver import Receiver
 from controller.sender import Sender
 from controller.forward import Forward
+
 from settings import Settings
 
 def close_port(port):
@@ -57,8 +58,8 @@ def wait_for_controller(settings: Settings = None):
     while valid_host is False:
         try:
             ip = settings.get_controller_ip()
-            ret = pyping.ping(ip)
-            if ret.ret_code == 0:
+            ret = ping(ip, timeout=2)
+            if ret:
                 valid_host = True
         except Exception as e:
             if print_err is True and len(ip) > 0:
@@ -145,10 +146,11 @@ if __name__ == '__main__':
         proc_car = Process(target=run_car, args=(settings, ))
         proc_car.start()
 
-        proc_sensor = Process(target=read_sensor, args=(settings, ))
-        proc_sensor.start()
+        if settings.get_im_edge():
+            proc_sensor = Process(target=read_sensor, args=(settings, ))
+            proc_sensor.start()
+            proc_sensor.join()
 
         proc_car.join()
         proc_discovery.join()
-        proc_sensor.join()
     sys.exit(0)

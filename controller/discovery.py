@@ -24,7 +24,6 @@ class Discovery:
 
         # TCP Socket for Controller-Cloud communication
         self.sock_cloud = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock_cloud.connect(('10.0.0.49', 5007))
 
         start_new_thread(self.listen_reply, ())
         start_new_thread(self.ping_cloud, ())
@@ -87,6 +86,8 @@ class Discovery:
     def ping_cloud(self):
         while True:
             try:
+                self.sock_cloud.close()
+                self.sock_cloud.connect(('10.0.0.49', 5007))
                 self.sock_cloud.sendall(self.msg.cloud_ping(self.settings.get_name()))
             except Exception as e:
                 print(f"\nNot possible to parse message from Cloud: {e}\n")

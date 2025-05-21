@@ -1,5 +1,5 @@
 import socket
-import pyping
+from ping3 import ping
 from controller.messages import Messages
 from settings import Settings
 
@@ -25,8 +25,8 @@ class Receiver():
             return (data, addr)
 
     def ping_ip(self, ip: str) -> bool:
-        ret = pyping.ping(ip)
-        if ret.ret_code == 0:
+        ret = ping(ip, timeout=2)
+        if ret:
             return True
         return False
 
