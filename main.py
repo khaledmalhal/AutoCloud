@@ -58,6 +58,8 @@ def wait_for_controller(settings: Settings = None):
     while valid_host is False:
         try:
             ip = settings.get_controller_ip()
+            if len(ip) == 0:
+                continue
             ret = ping(ip, timeout=2)
             if ret:
                 valid_host = True
