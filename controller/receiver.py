@@ -18,18 +18,21 @@ class Receiver():
 
         self.controller_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.controller_sock.bind(('0.0.0.0', 5006))
+        self.controller_sock.listen(1)
         start_new_thread(self.receive_commands, ())
         print("Ready to receive!")
 
     def receive_commands(self):
         while True:
-            data, addr = self.controller_sock.recvfrom(4096)
+            conn, addr = self.controller_sock.accept()
+            data = conn.recv(4096)
             try:
                 ret = eval(data.decode('utf-8'))
                 self.executer.execute(ret)
             except Exception as e:
                 print(f'Not possible to parse command from controller: {e}\nData: {data}.\n')
                 return (data, addr)
+            conn.close()
 
     def ping_ip(self, ip: str) -> bool:
         ret = ping(ip, timeout=2)
