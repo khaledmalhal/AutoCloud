@@ -2,6 +2,7 @@ import os
 import sys
 import psutil
 import socket
+import pyping
 from time import sleep
 import multiprocessing
 from multiprocessing import Process, Manager
@@ -33,18 +34,11 @@ def discover(settings: Settings = None):
         # If I am Edge, then I listen from Controllers
         receiver = Receiver(settings)
         while True:
-            data, addr = receiver.receive()
-            if data['type'] == receiver.msg.DISCOVERY:
-                controller = data['controller']
-                # print(f'[EdgeDevice] ->\tIP: {addr[0]}\tDiscovery type. Controller: {controller}')
-                try:
-                    ret = receiver.reply_controller(addr[0])
-                    if ret is None:
-                        # None return from socket.sendall() means success:
-                        # https://docs.python.org/3/library/socket.html#socket.socket.sendall
-                        settings.set_controller_ip(addr[0])
-                except Exception as e:
-                    print(f'[EdgeDevice] -> Error replying to Controller for Discovery')
+            ret = receiver.wait_for_discovered()
+            if ret is False:
+                # None return from socket.sendall() means success:
+                # https://docs.python.org/3/library/socket.html#socket.socket.sendall
+                settings.set_controller_ip("")
     else:
         # I am not the Edge. I am the Controller and I discover for Edge Devices.
         discovery = Discovery(settings)
@@ -58,57 +52,68 @@ def wait_for_controller(settings: Settings = None):
     Call this function before we attempt to read the sensor data,
     so the Edge Device can have a Controller to send the data to.
     """
-    valid_ip = False
-    print_err = False
-    while valid_ip is False:
+    valid_host = False
+    print_err = True
+    while valid_host is False:
         try:
             ip = settings.get_controller_ip()
-            socket.inet_aton(ip)
-            valid_ip = True
+            ret = pyping.ping(ip)
+            if ret.ret_code == 0:
+                valid_host = True
         except Exception as e:
-            if print_err is False and len(ip) > 0:
-                print(f'Controller IP is {ip}, but valid')
-                print_err = True
+            if print_err is True and len(ip) > 0:
+                print(f'Controller IP is {ip}, but valid: {e}')
+                print_err = False
             sleep(1)
 
 def read_sensor(settings: Settings = None):
-    wait_for_controller(settings)
     pid_light = os.fork()
-    try:
-        if pid_light:
-            # Parent. Not light.
-            sender = Sender(settings)
-            sensors = Sensors(name=settings.get_name())
-            last_CardUID = ""
-            upload_ready = True
-            while True:
-                key, value = sensors.read_line()
-                if key == "Card UID":
-                    if value != last_CardUID:
-                        last_CardUID = value
-                        upload_ready = True
+    while True:
+        try:
+            if pid_light:
+                wait_for_controller(settings)
+                # Parent. Not light.
+                sender = Sender(settings)
+                sensors = Sensors(name=settings.get_name())
+                last_CardUID = ""
+                upload_ready = True
+                while True:
+                    if len(settings.get_controller_ip()) == 0:
+                        break
+                    key, value = sensors.read_line()
+                    if key == "Card UID":
+                        if value != last_CardUID:
+                            last_CardUID = value
+                            upload_ready = True
+                        else:
+                            upload_ready = False
                     else:
-                        upload_ready = False
-                else:
-                    upload_ready = True
-                if upload_ready == True:
-                    sender.send_sensor_data((key, value))
-                    sleep(0.5)
-        else:
-            # Child process.
-            sender = Sender(settings)
-            adc = Adc()
-            last_light = -1
-            while True:
-                left  = adc.readRawADS7830(0)
-                right = adc.readRawADS7830(1)
-                light = int((left + right) / 2)
-                if light != last_light:
-                    last_light = light
-                    sender.send_sensor_data(('photoresistor', light))
-                sleep(1)
-    except Exception as e:
-        print("Exception:{}".format(e))
+                        upload_ready = True
+                    if upload_ready == True:
+                        ret = sender.send_sensor_data((key, value))
+                        if ret == False:
+                            break
+                        sleep(0.5)
+            else:
+                wait_for_controller(settings)
+                # Child process.
+                sender = Sender(settings)
+                adc = Adc()
+                last_light = -1
+                while True:
+                    if len(settings.get_controller_ip()) == 0:
+                        break
+                    left  = adc.readRawADS7830(0)
+                    right = adc.readRawADS7830(1)
+                    light = int((left + right) / 2)
+                    if light != last_light:
+                        last_light = light
+                        ret = sender.send_sensor_data(('photoresistor', light))
+                        if ret == False:
+                            break
+                    sleep(1)
+        except Exception as e:
+            print(f"Error sending data to the controller: {e}")
 
 class SettingsManager(BaseManager):
     pass

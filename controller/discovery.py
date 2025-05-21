@@ -1,17 +1,13 @@
-import os
 import socket
 import psutil
 import requests
-import json
 from _thread import *
 from time import sleep
-from dotenv import load_dotenv
 from controller.messages import Messages
 from settings import Settings
 
 class Discovery:
     def __init__(self, settings: Settings = None):
-        load_dotenv()
         self.settings = settings
         self.msg = Messages()
         self.name = self.settings.get_name()
@@ -85,6 +81,7 @@ class Discovery:
         msg_type = data['type']
         print(msg_type)
         if msg_type == self.msg.CLOUD_PING_REPLY:
+            # I should reply and let the Cloud know that I am alive
             pass
 
     def ping_cloud(self):
@@ -115,7 +112,7 @@ class Discovery:
             if edge == None:
                 edge = self.get_edge(data['edgedevice'])
                 self.edge_devices.append(edge)
-            edge['IP'] = addr[0]
+            edge['ip'] = addr[0]
             edge['controller'] = self.name
             self.update_edge(edge['name'])
             # print(self.edge_devices)

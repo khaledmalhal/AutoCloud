@@ -30,7 +30,7 @@ if __name__ == '__main__':
         else:
             receiver = Receiver(name='autocloud1')
             while True:
-                data, addr = receiver.receive()
+                data, addr = receiver.wait_for_discovered()
                 if data['type'] == receiver.msg.DISCOVERY:
                     controller = data['controller']
                     print(f'[EdgeDevice] ->\tIP: {addr[0]}\tDiscovery type. Controller: {controller}')
