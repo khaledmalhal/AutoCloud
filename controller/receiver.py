@@ -12,12 +12,12 @@ class Receiver():
         self.discovery_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.discovery_sock.bind(('0.0.0.0', 5005))
 
-        self.commands_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.commands_sock.bind(('0.0.0.0', 5006))
+        self.controller_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.controller_sock.bind(('0.0.0.0', 5006))
         print("Ready to receive!")
 
     def receive_commands(self):
-        data, addr = self.commands_sock.recvfrom(4096)
+        data, addr = self.controller_sock.recvfrom(4096)
         try:
             ret = eval(data.decode('utf-8'))
             return (ret, addr)

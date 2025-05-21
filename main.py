@@ -19,6 +19,7 @@ from controller.discovery import Discovery
 from controller.receiver import Receiver
 from controller.sender import Sender
 from controller.forward import Forward
+from controller.edgedevices import EdgeDevices
 
 from settings import Settings
 
@@ -43,8 +44,9 @@ def discover(settings: Settings = None):
             sleep(1)
     else:
         # I am not the Edge. I am the Controller and I discover for Edge Devices.
-        discovery = Discovery(settings)
-        forward = Forward(settings)
+        edgedevices = EdgeDevices(settings)
+        discovery = Discovery(settings, edgedevices)
+        forward = Forward(settings, edgedevices)
         while True:
             discovery.discover_edge_devices()
             sleep(2)

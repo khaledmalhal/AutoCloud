@@ -1,62 +1,31 @@
 import socket
 import psutil
-import requests
+from ping3 import ping
 from _thread import *
 from time import sleep
 from controller.messages import Messages
+from controller.edgedevices import EdgeDevices
 from settings import Settings
 
 class Discovery:
-    def __init__(self, settings: Settings = None):
+    def __init__(self, settings: Settings = None, edgedevices: EdgeDevices = None):
         self.settings = settings
         self.msg = Messages()
         self.name = self.settings.get_name()
         self.discover_msg = self.msg.discovery(self.name)
-        self.edge_devices = []
+        self.edgedevices = edgedevices
         self.api_url = self.settings.get_api_url()
-        self.obtain_devices_from_cloud()
-        print(f"Obtained the following edge devices for this controller: {[ edge['name'] for edge in self.edge_devices ]}")
 
         # TCP Socket for Edge-Controller communication
         self.sock_edge = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock_edge.bind(('', 5005))
+        self.sock_edge.bind(('0.0.0.0', 5005))
         self.sock_edge.listen(1)
 
         # TCP Socket for Controller-Cloud communication
         self.sock_cloud = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         start_new_thread(self.listen_reply, ())
-        start_new_thread(self.ping_cloud, ())
-
-    def obtain_devices_from_cloud(self):
-        ret = requests.get(f'{self.api_url}/controller/{self.name}')
-        try:
-            if ret.ok:
-                data = ret.json()
-                if len(data['edgedevices']) == 0:
-                    return
-                self.edge_devices = [edge for edge in data['edgedevices']]
-        except Exception as e:
-            print(f"Error obtaining Edge Devices: {e}")
-
-    def get_edge(self, edge: str):
-        ret = requests.get(f'{self.api_url}/edge/{edge}')
-        try:
-            if ret.ok:
-                data = ret.json()
-                return data
-        except Exception as e:
-            print(f'Error updating edge: {e}')
-            return None
-
-    def update_edge(self, edge: str):
-        ret = requests.post(f'{self.api_url}/controller/{self.name}/{edge}')
-        try:
-            if ret.ok:
-                return True
-        except Exception as e:
-            print(f'Error updating edge: {e}')
-            return False
+        start_new_thread(self.ping_edge_devices, ())
         
     def get_interfaces_IPs(self):
         ips = []
@@ -83,16 +52,21 @@ class Discovery:
             # I should reply and let the Cloud know that I am alive
             pass
 
-    def ping_cloud(self):
+    def ping_edge_devices(self):
         while True:
-            try:
-                self.sock_cloud.close()
-                self.sock_cloud.connect(('10.0.0.49', 5007))
-                self.sock_cloud.sendall(self.msg.cloud_ping(self.settings.get_name()))
-            except Exception as e:
-                print(f"\nNot possible to parse message from Cloud: {e}\n")
+            devices = self.edgedevices.get_edge_devices()
+            for device in devices:
+                if 'ip' not in device.keys():
+                    continue
+                name = device['name']
+                ip = device['ip']
+                print(f'Pinging {name} ({ip})')
+                ret = ping(device['ip'], timeout=2)
+                if ret:
+                    continue
+                print(f'Unlinking {name}')
+                self.edgedevices.unlink_edge(device['name'])
             sleep(10)
-
 
     def listen_reply(self):
         while True:
@@ -107,16 +81,10 @@ class Discovery:
             conn.close()
 
     def parse_client_msg(self, data, addr):
+        # We filter all the possible messages that the Edge Device could give us.
         reply_type = data['type']
         if reply_type == self.msg.DISCOVERY_REPLY:
-            edge = next((e for e in self.edge_devices if e['name'] == data['edgedevice']), None)
-            if edge == None:
-                edge = self.get_edge(data['edgedevice'])
-                self.edge_devices.append(edge)
-            edge['ip'] = addr[0]
-            edge['controller'] = self.name
-            self.update_edge(edge['name'])
-            # print(self.edge_devices)
+            self.edgedevices.append_or_update(data['edgedevice'], addr[0])
 
 
 if __name__ == '__main__':
