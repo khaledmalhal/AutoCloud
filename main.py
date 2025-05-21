@@ -40,6 +40,7 @@ def discover(settings: Settings = None):
                 # None return from socket.sendall() means success:
                 # https://docs.python.org/3/library/socket.html#socket.socket.sendall
                 settings.set_controller_ip("")
+            sleep(1)
     else:
         # I am not the Edge. I am the Controller and I discover for Edge Devices.
         discovery = Discovery(settings)
@@ -116,7 +117,7 @@ def read_sensor(settings: Settings = None):
                             break
                     sleep(1)
         except Exception as e:
-            print(f"Error sending data to the controller: {e}")
+            print(f"Error sending data to the controller ({settings.get_controller_ip()}): {e}")
 
 class SettingsManager(BaseManager):
     pass

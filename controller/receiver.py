@@ -73,9 +73,11 @@ class Receiver():
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((addr[0], 5005))
-                self.settings.set_controller_ip(addr[0])
                 ret = sock.sendall(self.msg.discovery_reply(self.name))
-                return ret is True
+                self.settings.set_controller_ip(addr[0])
+                if ret is None:
+                    print(f"Connect to a new Controller -> {addr[0]}")
+                return ret is None
             except Exception as e:
                 print(f'[EdgeDevice] -> Error replying to Controller for Discovery')
                 return False
