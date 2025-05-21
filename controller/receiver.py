@@ -10,6 +10,7 @@ class Receiver():
         self.msg = Messages()
         self.discovery_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.discovery_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.discovery_sock.bind(('0.0.0.0', 5005))
 
         self.commands_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.commands_sock.bind(('0.0.0.0', 5006))
