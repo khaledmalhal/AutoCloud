@@ -45,6 +45,8 @@ class Forward():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((edge_ip, 5006))
         ret = sock.sendall(str(data).encode('utf-8'))
+        print(ret)
+        sock.close()
         return ret is None
 
     def parse_command(self, edge: dict, data: dict):
@@ -56,7 +58,7 @@ class Forward():
             ip = edge['ip']
             self.send_data(ip, data)
 
-    def parse_edge_msg(self, data: dict, addr: tuple[str, str]):
+    def parse_msg(self, sock: socket.socket, data: dict, addr: tuple[str, str]):
         """
         Parse the messages obtained from the Edge Device and validate the message.
         """
@@ -68,7 +70,12 @@ class Forward():
                 value = data['value']
                 edgedevice = data['edgedevice']
                 self.upload_sensor_data(key, value, edgedevice)
+
         if reply_type == self.msg.COMMAND_EDGE:
+            # If the command was not send from the Cloud, then don't forward it
+            print(addr[0])
+            if addr[0] != '10.0.0.49':
+                raise Exception("The command is not from the Cloud. We will not accept commands that are not from the Cloud.")
             # Validate message and then parse the command
             keys = data.keys()
             if not("edgedevice" in keys and "command" in keys and "message" in keys):
@@ -79,6 +86,10 @@ class Forward():
                 raise Exception("Edge device is not in this controller")
             self.parse_command(device, data)
 
+        if reply_type == self.msg.CLOUD_PING:
+            # Respond a Cloud's ping
+            sock.sendall(self.msg.cloud_ping_reply())
+
     def listen_data(self):
         while True:
             conn, addr = self.sock.accept()
@@ -88,10 +99,12 @@ class Forward():
                 # and the parent will continue to read accept new sockets.
                 while True:
                     data = conn.recv(1024)
+                    if len(data) == 0:
+                        continue
                     try:
                         ret = eval(data.decode('utf-8'))
-                        self.parse_edge_msg(ret, addr)
+                        self.parse_msg(conn, ret, addr)
                     except Exception as e:
-                        print(f"\nNot possible to parse message from edge: {e}\nData: {data}.\n")
+                        print(f"\nNot possible to forward message: {e}\nData: {data}.\n")
                         conn.close()
                         sys.exit(1)

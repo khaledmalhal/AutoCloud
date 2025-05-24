@@ -2,6 +2,7 @@ import os
 import sys
 import psutil
 import socket
+import requests
 from ping3 import ping
 from time import sleep
 import multiprocessing
@@ -30,6 +31,15 @@ def close_port(port):
             process = psutil.Process(conn.pid)
             process.terminate()
 
+def update_controller_status(settings: Settings = None):
+    try:
+        name = settings.get_name()
+        ret = requests.patch(settings.get_api_url()+f'/controller/{name}', json= {'is_active': True})
+        ret.raise_for_status()
+        return ret.ok
+    except Exception as e:
+        print(f"Error updating Controller status: {e}")
+
 def discover(settings: Settings = None):
     print("Discover")
     if settings.get_im_edge() is True: 
@@ -44,6 +54,7 @@ def discover(settings: Settings = None):
             sleep(1)
     else:
         # I am not the Edge. I am the Controller and I discover for Edge Devices.
+        update_controller_status(settings)
         edgedevices = EdgeDevices(settings)
         discovery = Discovery(settings, edgedevices)
         forward = Forward(settings, edgedevices)

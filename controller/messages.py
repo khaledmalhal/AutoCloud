@@ -36,8 +36,7 @@ class Messages():
 
     def cloud_ping(self, name: str):
         return str({
-            "type": self.CLOUD_PING,
-            "controller": name
+            "type": self.CLOUD_PING
         }).encode('utf-8')
 
     def cloud_ping_reply(self):
