@@ -12,6 +12,9 @@ class Messages():
     COMMAND_PRINT    = "command_print"
     COMMAND_REPLY    = "command_reply"
 
+    SUCCESS_STATUS   = "success"
+    FAILED_STATUS    = "failed"
+
     def __init__(self):
         pass
 

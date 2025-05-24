@@ -82,6 +82,7 @@ class Forward():
                 raise Exception("Command message has a wrong format.")
             edge = data['edgedevice']
             device = self.edgedevices.get_edge_in_list(edge)
+
             if device is None:
                 raise Exception("Edge device is not in this controller")
             self.parse_command(device, data)
