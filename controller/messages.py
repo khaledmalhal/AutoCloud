@@ -1,4 +1,4 @@
-import json
+import uuid
 
 class Messages():
     # Literals
@@ -10,6 +10,7 @@ class Messages():
     COMMAND_EDGE     = "command_edge"
 
     COMMAND_PRINT    = "command_print"
+    COMMAND_REPLY    = "command_reply"
 
     def __init__(self):
         pass
@@ -34,7 +35,7 @@ class Messages():
             "edgedevice": edgedevice
         }).encode('utf-8')
 
-    def cloud_ping(self, name: str):
+    def cloud_ping(self):
         return str({
             "type": self.CLOUD_PING
         }).encode('utf-8')
@@ -46,8 +47,17 @@ class Messages():
 
     def print_command(self, edge: str, command: str, msg: str):
         return str({
+            "id": uuid.uuid1().bytes,
             "type": self.COMMAND_EDGE,
             "edgedevice": edge,
             "command": command,
             "message": msg
-        }).encode('utf-u')
+        }).encode('utf-8')
+
+    def command_reply(self, edge: str, id: str, status: str):
+        return str({
+            "id": id,
+            "type": self.COMMAND_REPLY,
+            "edgedevice": edge,
+            "status": status
+        }).encode('utf-8')

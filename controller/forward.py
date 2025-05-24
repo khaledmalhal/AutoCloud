@@ -78,7 +78,7 @@ class Forward():
                 raise Exception("The command is not from the Cloud. We will not accept commands that are not from the Cloud.")
             # Validate message and then parse the command
             keys = data.keys()
-            if not("edgedevice" in keys and "command" in keys and "message" in keys):
+            if not("edgedevice" in keys and "command" in keys and "message" in keys and "id" in keys):
                 raise Exception("Command message has a wrong format.")
             edge = data['edgedevice']
             device = self.edgedevices.get_edge_in_list(edge)
@@ -88,7 +88,12 @@ class Forward():
 
         if reply_type == self.msg.CLOUD_PING:
             # Respond a Cloud's ping
-            sock.sendall(self.msg.cloud_ping_reply())
+            return sock.sendall(self.msg.cloud_ping_reply()) is None
+
+        if reply_type == self.msg.COMMAND_REPLY:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect(('10.0.0.49', 5007))
+            return sock.sendall(str(data).encode('utf-8')) is None
 
     def listen_data(self):
         while True:
