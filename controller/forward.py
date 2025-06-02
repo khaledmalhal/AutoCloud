@@ -46,7 +46,6 @@ class Forward():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((edge_ip, 5006))
         ret = sock.sendall(str(data).encode('utf-8'))
-        print(ret)
         if ret is None:
             # Wait for reply from the Edge Device
             report = sock.recv(4096)
@@ -108,7 +107,7 @@ class Forward():
 
         if reply_type == self.msg.COMMAND_REPLY:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect(('10.0.0.49', 5007))
+            sock.connect(('172.16.0.2', 5007))
             success = sock.sendall(str(data).encode('utf-8')) is None
             sock.close()
             return success

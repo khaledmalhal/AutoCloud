@@ -88,9 +88,16 @@ def read_sensor(settings: Settings = None):
     while True:
         try:
             if pid_light:
+                usb_conn = False
                 wait_for_controller(settings)
                 # Parent. Not light.
-                sender = Sender(settings)
+                while usb_conn is False:
+                    try:
+                        sender = Sender(settings)
+                        usb_conn = True
+                    except Exception as e:
+                        usb_conn = False
+                        sleep(5)
                 sensors = Sensors(name=settings.get_name())
                 last_CardUID = ""
                 upload_ready = True
