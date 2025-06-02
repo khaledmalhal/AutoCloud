@@ -12,6 +12,7 @@ class Messages():
     COMMAND_PRINT    = "command_print"
     COMMAND_REPLY    = "command_reply"
 
+    PENDING_STATUS   = "pending"
     SUCCESS_STATUS   = "success"
     FAILED_STATUS    = "failed"
 
@@ -49,13 +50,14 @@ class Messages():
         }).encode('utf-8')
 
     def print_command(self, edge: str, command: str, msg: str):
-        return str({
+        return {
             "id": uuid.uuid1().bytes,
             "type": self.COMMAND_EDGE,
             "edgedevice": edge,
             "command": command,
-            "message": msg
-        }).encode('utf-8')
+            "message": msg,
+            "status": self.PENDING_STATUS
+        }
 
     def command_reply(self, edge: str, id: str, status: str):
         return str({

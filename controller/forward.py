@@ -1,6 +1,7 @@
 import socket
 import os
 import sys
+from subprocess import *
 from _thread import *
 from settings import Settings
 from controller.messages import Messages
@@ -41,13 +42,24 @@ class Forward():
             except Exception as e:
                 print(f'Error uploading data to InfluxDB:\n\t->{e}')
 
-    def send_data(self, edge_ip: str, data: dict):
+    def send_data_wait_reply(self, edge_ip: str, data: dict):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((edge_ip, 5006))
         ret = sock.sendall(str(data).encode('utf-8'))
         print(ret)
-        sock.close()
-        return ret is None
+        if ret is None:
+            # Wait for reply from the Edge Device
+            report = sock.recv(4096)
+            report = eval(report.decode('utf-8'))
+            sock.close()
+            try:
+                success = self.parse_msg(sock, report, (edge_ip, 5006))
+                if success is False:
+                    print(f'Error forwarding command report from edge {edge_ip}. Data:\n{report}.\n')
+                sys.exit(0)
+            except Exception as e:
+                print(f'Error forwarding command report from edge {edge_ip}. Data:\n{report}.\nError:\n{e}\n')
+        sys.exit(1)
 
     def parse_command(self, edge: dict, data: dict):
         # Parse the command and forward it to the Edge Device
@@ -56,7 +68,7 @@ class Forward():
             raise Exception("Unknown Edge Device's IP.")
         if command == self.msg.COMMAND_PRINT:
             ip = edge['ip']
-            self.send_data(ip, data)
+            self.send_data_wait_reply(ip, data)
 
     def parse_msg(self, sock: socket.socket, data: dict, addr: tuple[str, str]):
         """
@@ -73,9 +85,9 @@ class Forward():
 
         if reply_type == self.msg.COMMAND_EDGE:
             # If the command was not send from the Cloud, then don't forward it
-            print(addr[0])
-            if addr[0] != '10.0.0.49':
-                raise Exception("The command is not from the Cloud. We will not accept commands that are not from the Cloud.")
+            # print(addr[0])
+            # if addr[0] != '10.0.0.49':
+            #     raise Exception("The command is not from the Cloud. We will not accept commands that are not from the Cloud.")
             # Validate message and then parse the command
             keys = data.keys()
             if not("edgedevice" in keys and "command" in keys and "message" in keys and "id" in keys):
@@ -89,18 +101,26 @@ class Forward():
 
         if reply_type == self.msg.CLOUD_PING:
             # Respond a Cloud's ping
-            return sock.sendall(self.msg.cloud_ping_reply()) is None
+            ret = sock.sendall(self.msg.cloud_ping_reply())
+            sock.close()
+            sys.exit(0)
+            return ret is None
 
         if reply_type == self.msg.COMMAND_REPLY:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect(('10.0.0.49', 5007))
-            return sock.sendall(str(data).encode('utf-8')) is None
+            success = sock.sendall(str(data).encode('utf-8')) is None
+            sock.close()
+            return success
+
 
     def listen_data(self):
         while True:
             conn, addr = self.sock.accept()
             pid = os.fork()
             if pid == 0:
+                ip = addr[0]
+                print(f'Created process. IP: {ip}')
                 # Create a child that has the open socket with the Edge Device
                 # and the parent will continue to read accept new sockets.
                 while True:
@@ -113,4 +133,5 @@ class Forward():
                     except Exception as e:
                         print(f"\nNot possible to forward message: {e}\nData: {data}.\n")
                         conn.close()
+                        print('Killing process')
                         sys.exit(1)
