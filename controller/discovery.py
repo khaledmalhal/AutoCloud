@@ -64,8 +64,8 @@ class Discovery:
                 ret = ping(device['ip'], timeout=2)
                 if ret:
                     continue
-                print(f'Unlinking {name}')
-                self.edgedevices.unlink_edge(device['name'])
+                print(f'Removing Edge Device {name}')
+                self.edgedevices.remove_edge(name)
             sleep(10)
 
     def listen_reply(self):
@@ -84,6 +84,7 @@ class Discovery:
         # We filter all the possible messages that the Edge Device could give us.
         reply_type = data['type']
         if reply_type == self.msg.DISCOVERY_REPLY:
+            print(f"DISCOVERY_REPLY from {data['edgedevice']}: {addr[0]}")
             self.edgedevices.append_or_update(data['edgedevice'], addr[0])
 
 
