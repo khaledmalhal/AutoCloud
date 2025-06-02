@@ -93,12 +93,12 @@ def read_sensor(settings: Settings = None):
                 # Parent. Not light.
                 while usb_conn is False:
                     try:
-                        sender = Sender(settings)
+                        sensors = Sensors(name=settings.get_name())
                         usb_conn = True
                     except Exception as e:
                         usb_conn = False
                         sleep(5)
-                sensors = Sensors(name=settings.get_name())
+                sender = Sender(settings)
                 last_CardUID = ""
                 upload_ready = True
                 while True:
