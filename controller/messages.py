@@ -49,7 +49,7 @@ class Messages():
             "type": self.CLOUD_PING_REPLY
         }).encode('utf-8')
 
-    def print_command(self, edge: str, command: str, msg: str):
+    def command_edge(self, edge: str, command: str, msg: str):
         return {
             "id": uuid.uuid1().bytes,
             "type": self.COMMAND_EDGE,

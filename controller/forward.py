@@ -1,6 +1,7 @@
 import socket
 import os
 import sys
+import requests
 from subprocess import *
 from _thread import *
 from settings import Settings
@@ -14,6 +15,7 @@ class Forward():
     commands that the Cloud want to send to the edge devices.
     """
     def __init__(self, settings: Settings = None, edgedevices: EdgeDevices = None):
+        self.settings = settings
         self.influx = Influx(settings)
         self.msg = Messages()
         self.edgedevices = edgedevices
@@ -41,6 +43,14 @@ class Forward():
                 self.influx.upload_data((key, value), from_edge)
             except Exception as e:
                 print(f'Error uploading data to InfluxDB:\n\t->{e}')
+
+    def update_report_status(self, id: str, status: str):
+        try:
+            ret = requests.patch(f'{self.settings.api_url}/commandreport?id={id}&status={status}')
+            ret.raise_for_status()
+            return ret.ok
+        except Exception as e:
+            print(e)
 
     def send_data_wait_reply(self, edge_ip: str, data: dict):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -106,11 +116,8 @@ class Forward():
             return ret is None
 
         if reply_type == self.msg.COMMAND_REPLY:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect(('172.16.0.2', 5007))
-            success = sock.sendall(str(data).encode('utf-8')) is None
-            sock.close()
-            return success
+            ret = self.update_report_status(data['id'], data['status'])
+            return ret
 
 
     def listen_data(self):
