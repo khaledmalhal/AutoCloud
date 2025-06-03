@@ -46,7 +46,7 @@ class Forward():
 
     def update_report_status(self, id: str, status: str):
         try:
-            ret = requests.patch(f'{self.settings.api_url}/commandreport?id={id}&status={status}')
+            ret = requests.patch(f'{self.settings.get_api_url()}/commandreport?id={id}&status={status}')
             ret.raise_for_status()
             return ret.ok
         except Exception as e:
