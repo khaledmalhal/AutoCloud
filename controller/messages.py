@@ -11,6 +11,8 @@ class Messages():
 
     COMMAND_PRINT    = "command_print"
     COMMAND_REPLY    = "command_reply"
+    COMMAND_RUN_CAR  = "command_run_car"
+    COMMAND_STOP_CAR = "command_stop_car"
 
     PENDING_STATUS   = "pending"
     SUCCESS_STATUS   = "success"

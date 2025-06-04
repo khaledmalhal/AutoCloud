@@ -28,9 +28,12 @@ class Receiver():
             data = conn.recv(4096)
             try:
                 ret = eval(data.decode('utf-8'))
-                if self.executer.execute(ret) is True:
+                exec, msg = self.executer.execute(ret)
+                if exec is True:
                     conn.sendall(self.msg.command_reply(ret['edgedevice'], ret['id'], Messages.SUCCESS_STATUS))
-                    conn.close()
+                else:
+                    conn.sendall(self.msg.command_reply(ret['edgedevice'], ret['id'], Messages.FAILED_STATUS))
+                conn.close()
             except Exception as e:
                 print(f'Not possible to parse command from controller: {e}\nData: {data}.\n')
                 return (data, addr)

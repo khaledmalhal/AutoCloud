@@ -1,4 +1,5 @@
-import time
+import signal
+import sys
 from Motor import *
 from periphery import GPIO
 
@@ -10,6 +11,8 @@ class Line_Tracking:
         self.IR01_GPIO = GPIO(self.IR01, 'in')
         self.IR02_GPIO = GPIO(self.IR02, 'in')
         self.IR03_GPIO = GPIO(self.IR03, 'in')
+        signal.signal(signal.SIGINT, self.signal_handler)
+
     def run(self):
         self.LMR=0x00
         if self.IR01_GPIO.read() != True:
@@ -37,6 +40,13 @@ class Line_Tracking:
         elif self.LMR==7:
             #pass
             PWM.setMotorModel(0,0,0,0)
+    
+    def stop(self):
+        PWM.setMotorModel(0,0,0,0)
+    
+    def signal_handler(self, frame):
+        self.stop()
+        sys.exit(0)
             
 infrared=Line_Tracking()
 # Main program logic follows:
