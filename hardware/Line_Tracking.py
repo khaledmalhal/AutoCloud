@@ -1,6 +1,6 @@
 import signal
 import sys
-from Motor import *
+from hardware.Motor import *
 from periphery import GPIO
 
 class Line_Tracking:
