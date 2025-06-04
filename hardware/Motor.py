@@ -1,6 +1,6 @@
 import math
-from PCA9685 import PCA9685
-from ADC import *
+from hardware.PCA9685 import PCA9685
+from hardware.ADC import *
 import time
 import os
 import inspect
