@@ -5,6 +5,7 @@ from periphery import GPIO
 
 class Line_Tracking:
     def __init__(self):
+        self.PWM = Motor()
         self.IR01 = 148
         self.IR02 = 147
         self.IR03 = 154
@@ -24,33 +25,33 @@ class Line_Tracking:
 
         if self.LMR==2:
             # Move forward
-            PWM.setMotorModel(800,800,800,800)
+            self.PWM.setMotorModel(800,800,800,800)
         elif self.LMR==4:
             # Move left
-            PWM.setMotorModel(-1500,-1500,2500,2500)
+            self.PWM.setMotorModel(-1500,-1500,2500,2500)
         elif self.LMR==6:
             # Move left sharp
-            PWM.setMotorModel(-2000,-2000,4000,4000)
+            self.PWM.setMotorModel(-2000,-2000,4000,4000)
         elif self.LMR==1:
             # Move left
-            PWM.setMotorModel(2500,2500,-1500,-1500)
+            self.PWM.setMotorModel(2500,2500,-1500,-1500)
         elif self.LMR==3:
             # Move left sharp
-            PWM.setMotorModel(4000,4000,-2000,-2000)
+            self.PWM.setMotorModel(4000,4000,-2000,-2000)
         elif self.LMR==7:
             #pass
-            PWM.setMotorModel(0,0,0,0)
+            self.PWM.setMotorModel(0,0,0,0)
     
     def stop(self):
-        PWM.setMotorModel(0,0,0,0)
+        self.PWM.setMotorModel(0,0,0,0)
     
     def signal_handler(self, frame):
         self.stop()
         sys.exit(0)
             
-infrared=Line_Tracking()
 # Main program logic follows:
 if __name__ == '__main__':
+    infrared = Line_Tracking()
     print('Program is starting ... ')
     try:
         infrared.run()

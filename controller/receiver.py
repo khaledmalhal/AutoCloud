@@ -29,6 +29,7 @@ class Receiver():
             try:
                 ret = eval(data.decode('utf-8'))
                 exec, msg = self.executer.execute(ret)
+                print(msg)
                 if exec is True:
                     conn.sendall(self.msg.command_reply(ret['edgedevice'], ret['id'], Messages.SUCCESS_STATUS))
                 else:

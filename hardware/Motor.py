@@ -101,16 +101,13 @@ class Motor:
             BL = VY - VX - W
             BR = VY + VX + W
 
-            PWM.setMotorModel(FL, BL, FR, BR)
+            self.setMotorModel(FL, BL, FR, BR)
             print("rotating")
             time.sleep(5 * self.time_proportion * bat_compensate / 1000)
             angle -= 5
 
 
-PWM = Motor()
-
-
-def loop():
+def loop(PWM: Motor):
     PWM.setMotorModel(2000, 2000, 2000, 2000)  # Forward
     time.sleep(1.5)
     PWM.setMotorModel(-2000, -2000, -2000, -2000)  # Back
@@ -122,12 +119,13 @@ def loop():
     PWM.setMotorModel(0, 0, 0, 0)  # Stop
 
 
-def destroy():
+def destroy(PWM: Motor):
     PWM.setMotorModel(0, 0, 0, 0)
 
 
 if __name__ == '__main__':
+    PWM = Motor()
     try:
-        loop()
+        loop(PWM)
     except KeyboardInterrupt:  # When 'Ctrl+C' is pressed, the child program destroy() will be  executed.
         destroy()

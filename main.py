@@ -44,6 +44,7 @@ def discover(settings: Settings = None):
     print("Discover")
     if settings.get_im_edge() is True: 
         # If I am Edge, then I listen from Controllers
+        print("I am the edge")
         receiver = Receiver(settings)
         while True:
             ret = receiver.wait_for_discovered()
