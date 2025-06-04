@@ -75,7 +75,7 @@ class Forward():
         command = data['command']
         if 'ip' not in edge.keys():
             raise Exception("Unknown Edge Device's IP.")
-        if command == self.msg.COMMAND_PRINT:
+        if command == self.msg.COMMAND_PRINT or command == self.msg.COMMAND_RUN_CAR or command == self.msg.COMMAND_STOP_CAR:
             ip = edge['ip']
             self.send_data_wait_reply(ip, data)
 

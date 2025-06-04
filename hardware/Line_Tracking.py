@@ -45,7 +45,7 @@ class Line_Tracking:
     def stop(self):
         self.PWM.setMotorModel(0,0,0,0)
     
-    def signal_handler(self, frame):
+    def signal_handler(self, signum, frame):
         self.stop()
         sys.exit(0)
             
