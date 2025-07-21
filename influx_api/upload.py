@@ -19,7 +19,7 @@ class Influx:
     def __init__(self, settings: Settings = None):
         load_dotenv()
         self.settings = settings
-        self.name   = settings.get_name()
+        self.source = settings.get_name()
         self.bucket = settings.get_influx_bucket()
         self.token  = settings.get_influx_token()
         self.org    = settings.get_influx_org()
@@ -51,7 +51,7 @@ class Influx:
             value = measure['value']
             measurement = measure['name']
 
-            point = Point(measurement).tag("name", from_edge).field(field, value)
+            point = Point(measurement).tag("source", from_edge).field(field, value)
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
             print(f'Uploaded successfully {data}')
         except Exception as e:
