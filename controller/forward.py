@@ -27,22 +27,15 @@ class Forward():
         self.sock.listen(1)
         start_new_thread(self.listen_data, ())
 
-    def upload_sensor_data(self, key: str, value: str, from_edge: str):
+    def upload_sensor_data(self, data: tuple[str, str], location: str, from_edge: str):
         """
         Here, we do any pre-processing if needed for the data.
         For example, we don't send the same read Card UID, otherwise we will saturate the DB.
         """
-        upload_ready = True
-        if key == "Card UID":
-            if value != self.last_CardUID:
-                self.last_CardUID = value
-            else:
-                upload_ready = False
-        if upload_ready == True:
-            try:
-                self.influx.upload_data((key, value), from_edge)
-            except Exception as e:
-                print(f'Error uploading data to InfluxDB:\n\t->{e}')
+        try:
+            self.influx.upload_data(data, location, from_edge)
+        except Exception as e:
+            print(f'Error uploading data to InfluxDB:\n\t->{e}')
 
     def update_report_status(self, id: str, status: str):
         try:
@@ -86,11 +79,12 @@ class Forward():
         reply_type = data['type']
         if reply_type == self.msg.SENSOR_DATA:
             keys = data.keys()
-            if 'key' in keys and 'value' in keys and 'edgedevice' in keys:
-                key = data['key']
-                value = data['value']
+            if 'key' in keys and 'value' in keys and 'location' in keys and 'edgedevice' in keys:
+                key        = data['key']
+                value      = data['value']
+                location   = data['location']
                 edgedevice = data['edgedevice']
-                self.upload_sensor_data(key, value, edgedevice)
+                self.upload_sensor_data((key, value), location, edgedevice)
 
         if reply_type == self.msg.COMMAND_EDGE:
             # If the command was not send from the Cloud, then don't forward it

@@ -100,22 +100,22 @@ def read_sensor(settings: Settings = None):
                         usb_conn = False
                         sleep(5)
                 sender = Sender(settings)
-                last_CardUID = ""
+                lastCardUID = ""
                 upload_ready = True
                 while True:
                     if len(settings.get_controller_ip()) == 0:
                         break
                     key, value = sensors.read_line()
                     if key == "Card UID":
-                        if value != last_CardUID:
-                            last_CardUID = value
+                        if value != lastCardUID:
+                            lastCardUID = value
                             upload_ready = True
                         else:
                             upload_ready = False
                     else:
                         upload_ready = True
-                    if upload_ready == True:
-                        ret = sender.send_sensor_data((key, value))
+                    if upload_ready == True and len(lastCardUID) > 0:
+                        ret = sender.send_sensor_data((key, value), lastCardUID)
                         if ret == False:
                             break
                         sleep(0.5)

@@ -16,12 +16,13 @@ class Sender():
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.settings.get_controller_ip(), 5006))
 
-    def send_sensor_data(self, data: tuple):
+    def send_sensor_data(self, data: tuple, location: str):
         key = data[0]
         value = str(data[1])
         edgedevice = self.settings.get_name()
         try:
-            self.sock.sendall(self.msg.sensor_data(key, value, edgedevice))
+            print(f'Sending: {self.msg.sensor_data((key, value), location, edgedevice)}')
+            self.sock.sendall(self.msg.sensor_data((key, value), location, edgedevice))
             return True
         except Exception as e:
             self.settings.set_controller_ip("")

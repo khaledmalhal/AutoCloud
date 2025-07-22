@@ -44,14 +44,18 @@ class Influx:
             print('There has been an error getting schema.')
         threading.Timer(10, self.update_schema).start()
 
-    def upload_data(self, data: tuple[str, str], from_edge: str):
+    def upload_data(self, data: tuple[str, str], location: str, from_edge: str):
         try:
             measure = self.schema.parse_measurement_value(data[0], data[1])
             field = measure['units']
             value = measure['value']
             measurement = measure['name']
 
-            point = Point(measurement).tag("source", from_edge).field(field, value)
+            point = (Point(measurement)
+                     .tag("source", from_edge)
+                     .tag("location", location)
+                     .field(field, value))
+            print(f'Writing to InfluxDB: {point.to_line_protocol()}')
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
             print(f'Uploaded successfully {data}')
         except Exception as e:
