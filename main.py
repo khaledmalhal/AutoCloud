@@ -115,7 +115,7 @@ def read_sensor(settings: Settings = None):
                     ret = sender.send_sensor_data((key, value), lastCardUID)
                     if ret == False:
                         break
-                
+                sleep(0.5)
                 # Send light info from the car.
                 left  = adc.readRawADS7830(0)
                 right = adc.readRawADS7830(1)
