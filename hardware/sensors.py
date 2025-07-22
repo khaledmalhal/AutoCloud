@@ -11,7 +11,7 @@ class Sensors:
         input = self.esp32.read_until(expected=b'\n')
         input = input.decode('utf-8').split(":")
         key   = input[0]
-        value = input[1][:-1]
+        value = input[1][:-1].strip()
         print(f'Key: {key}. Value: {value}.')
         return (key, value)
 

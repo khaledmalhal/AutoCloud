@@ -101,7 +101,6 @@ def read_sensor(settings: Settings = None):
             adc = Adc()
             last_light = -1
             lastCardUID = ""
-            upload_ready = True
             while True:
                 if len(settings.get_controller_ip()) == 0:
                     # Check if we know the controller.
@@ -112,12 +111,7 @@ def read_sensor(settings: Settings = None):
                 if key == "Card UID":
                     if value != lastCardUID:
                         lastCardUID = value
-                        upload_ready = True
-                    else:
-                        upload_ready = False
-                else:
-                    upload_ready = True
-                if upload_ready == True and len(lastCardUID) > 0:
+                elif len(lastCardUID) > 0:
                     ret = sender.send_sensor_data((key, value), lastCardUID)
                     if ret == False:
                         break
@@ -126,7 +120,7 @@ def read_sensor(settings: Settings = None):
                 left  = adc.readRawADS7830(0)
                 right = adc.readRawADS7830(1)
                 light = int((left + right) / 2)
-                if light != last_light:
+                if light != last_light and len(lastCardUID) > 0:
                     last_light = light
                     ret = sender.send_sensor_data(('photoresistor', light), lastCardUID)
                     if ret == False:
