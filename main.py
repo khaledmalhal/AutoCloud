@@ -85,60 +85,56 @@ def wait_for_controller(settings: Settings = None):
             sleep(1)
 
 def read_sensor(settings: Settings = None):
-    pid_light = os.fork()
     while True:
         try:
-            if pid_light:
-                usb_conn = False
-                wait_for_controller(settings)
-                # Parent. Not light.
-                while usb_conn is False:
-                    try:
-                        sensors = Sensors(name=settings.get_name())
-                        usb_conn = True
-                    except Exception as e:
-                        usb_conn = False
-                        sleep(5)
-                sender = Sender(settings)
-                lastCardUID = ""
-                upload_ready = True
-                while True:
-                    if len(settings.get_controller_ip()) == 0:
-                        break
-                    key, value = sensors.read_line()
-                    if key == "Card UID":
-                        if value != lastCardUID:
-                            lastCardUID = value
-                            upload_ready = True
-                        else:
-                            upload_ready = False
-                    else:
+            usb_conn = False
+            wait_for_controller(settings)
+            while usb_conn is False:
+                try:
+                    sensors = Sensors(name=settings.get_name())
+                    usb_conn = True
+                except Exception as e:
+                    usb_conn = False
+                    del sensors
+                    sleep(5)
+            sender = Sender(settings)
+            adc = Adc()
+            last_light = -1
+            lastCardUID = ""
+            upload_ready = True
+            while True:
+                if len(settings.get_controller_ip()) == 0:
+                    # Check if we know the controller.
+                    del sender
+                    break
+                # Send whatever data is read from the IoT
+                key, value = sensors.read_line()
+                if key == "Card UID":
+                    if value != lastCardUID:
+                        lastCardUID = value
                         upload_ready = True
-                    if upload_ready == True and len(lastCardUID) > 0:
-                        ret = sender.send_sensor_data((key, value), lastCardUID)
-                        if ret == False:
-                            break
-                        sleep(0.5)
-            else:
-                wait_for_controller(settings)
-                # Child process.
-                sender = Sender(settings)
-                adc = Adc()
-                last_light = -1
-                while True:
-                    if len(settings.get_controller_ip()) == 0:
+                    else:
+                        upload_ready = False
+                else:
+                    upload_ready = True
+                if upload_ready == True and len(lastCardUID) > 0:
+                    ret = sender.send_sensor_data((key, value), lastCardUID)
+                    if ret == False:
                         break
-                    left  = adc.readRawADS7830(0)
-                    right = adc.readRawADS7830(1)
-                    light = int((left + right) / 2)
-                    if light != last_light:
-                        last_light = light
-                        ret = sender.send_sensor_data(('photoresistor', light))
-                        if ret == False:
-                            break
-                    sleep(1)
+                
+                # Send light info from the car.
+                left  = adc.readRawADS7830(0)
+                right = adc.readRawADS7830(1)
+                light = int((left + right) / 2)
+                if light != last_light:
+                    last_light = light
+                    ret = sender.send_sensor_data(('photoresistor', light), lastCardUID)
+                    if ret == False:
+                        break
+                sleep(0.5)
         except Exception as e:
             print(f"Error sending data to the controller ({settings.get_controller_ip()}): {e}")
+            sleep(1)
 
 class SettingsManager(BaseManager):
     pass

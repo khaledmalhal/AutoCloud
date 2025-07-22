@@ -10,6 +10,9 @@ class Sender():
         self.connect_socket()
         print("Ready to send sensor data!")
 
+    def __del__(self):
+        self.sock.close()
+
     def connect_socket(self):
         if self.sock is not None:
             self.sock.close()

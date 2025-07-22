@@ -33,7 +33,7 @@ class Messages():
             "edgedevice": name
         }).encode('utf-8')
 
-    def sensor_data(self, data: tuple, location: str | dict, edgedevice: str):
+    def sensor_data(self, data: tuple, location: str, edgedevice: str):
         "Location can be either CardUID or `{latitude: 40.0000, longitude: 1.0000}`"
         return str({
             "type": self.SENSOR_DATA,
