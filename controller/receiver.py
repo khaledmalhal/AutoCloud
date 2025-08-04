@@ -10,7 +10,10 @@ class Receiver():
         self.settings = settings
         self.name = self.settings.get_name()
         self.msg = Messages()
-        self.executer = CommandExec(settings)
+        try:
+            self.executer = CommandExec(settings)
+        except Exception as e:
+            print("This edge device doesn't have an IoT")
 
         self.discovery_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.discovery_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
