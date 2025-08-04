@@ -61,11 +61,20 @@ class Discovery:
                 name = device['name']
                 ip = device['ip']
                 print(f'Pinging {name} ({ip})')
-                ret = ping(device['ip'], timeout=2)
-                if ret:
-                    continue
-                print(f'Removing Edge Device {name}')
-                self.edgedevices.remove_edge(name)
+                try:
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.settimeout(2)
+                    sock.connect((ip, 5006))
+                    sock.sendall(self.msg.edge_device_ping())
+                    reply, _ = sock.recvfrom(1024)
+                    reply = eval(reply.decode('utf-8'))
+                    if reply['type'] == self.msg.EDGE_DEVICE_REPLY:
+                        sock.close()
+                    else:
+                        raise Exception(f"Haven't received a reply from the Edge Device")
+                except Exception as e:
+                    print(f'Unable to ping {name} ({ip}). Disabling Edge device...\nReason: {e}')
+                    self.edgedevices.remove_edge(name)
             sleep(10)
 
     def listen_reply(self):

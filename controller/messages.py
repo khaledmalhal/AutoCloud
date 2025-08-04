@@ -2,12 +2,14 @@ import uuid
 
 class Messages():
     # Literals
-    DISCOVERY        = "discovery"
-    DISCOVERY_REPLY  = "discovery_reply"
-    SENSOR_DATA      = "sensor_data"
-    CLOUD_PING       = "cloud_ping"
-    CLOUD_PING_REPLY = "cloud_ping_reply"
-    COMMAND_EDGE     = "command_edge"
+    DISCOVERY         = "discovery"
+    DISCOVERY_REPLY   = "discovery_reply"
+    SENSOR_DATA       = "sensor_data"
+    CLOUD_PING        = "cloud_ping"
+    CLOUD_PING_REPLY  = "cloud_ping_reply"
+    EDGE_DEVICE_PING  = "edge_device_ping"
+    EDGE_DEVICE_REPLY = "edge_device_reply"
+    COMMAND_EDGE      = "command_edge"
 
     COMMAND_PRINT    = "command_print"
     COMMAND_REPLY    = "command_reply"
@@ -51,6 +53,16 @@ class Messages():
     def cloud_ping_reply(self):
         return str({
             "type": self.CLOUD_PING_REPLY
+        }).encode('utf-8')
+
+    def edge_device_ping(self):
+        return str({
+            "type": self.EDGE_DEVICE_PING
+        }).encode('utf-8')
+
+    def edge_device_reply(self):
+        return str({
+            "type": self.EDGE_DEVICE_REPLY
         }).encode('utf-8')
 
     def command_edge(self, edge: str, command: str, msg: str):

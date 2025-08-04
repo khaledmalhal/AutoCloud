@@ -31,6 +31,9 @@ class Receiver():
             data = conn.recv(4096)
             try:
                 ret = eval(data.decode('utf-8'))
+                if 'command' not in ret.keys():
+                    self.reply_controller(ret, addr, conn)
+                    continue
                 exec, msg = self.executer.execute(ret)
                 print(msg)
                 if exec is True:
@@ -81,7 +84,7 @@ class Receiver():
             print(f"Not possible to parse message from controller: {e}\nData: {data}.\n")
             return False
 
-    def reply_controller(self, data: dict, addr: tuple):
+    def reply_controller(self, data: dict, addr: tuple, sock_reply: socket.socket = None):
         if data['type'] == self.msg.DISCOVERY:
             controller = self.settings.get_controller_ip()
             if self.validate_controller(controller, addr[0]) is True:
@@ -99,6 +102,9 @@ class Receiver():
             except Exception as e:
                 print(f'[EdgeDevice] -> Error replying to Controller for Discovery')
                 return False
+        if data['type'] == self.msg.EDGE_DEVICE_PING:
+            sock_reply.sendall(self.msg.edge_device_reply())
+            sock_reply.close()
 
 if __name__ == '__main__':
     receiver = Receiver()
