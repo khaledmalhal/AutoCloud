@@ -67,7 +67,7 @@ class Messages():
 
     def command_edge(self, edge: str, command: str, msg: str):
         return {
-            "id": uuid.uuid1().bytes,
+            "id": str(uuid.uuid4()),
             "type": self.COMMAND_EDGE,
             "edgedevice": edge,
             "command": command,
