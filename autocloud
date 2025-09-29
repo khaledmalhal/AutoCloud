@@ -1,0 +1,58 @@
+#!/bin/sh /lib/init/init-d-script
+
+### BEGIN INIT INFO
+# Required-Start:    $network $remote_fs $syslog
+# Required-Stop:     $network $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Autocloud service
+# Description: This script will start the Autocloud service
+### END INIT INFO
+
+# Written by Khaled Malhal Abbas <khaled.malhal at estudiantat.upc.edu>
+
+DAEMON=/usr/bin/python3
+DAEMON_ARGS=main.py
+PROJECT_DIR=/opt/AutoCloud/
+PIDFILE=/run/autocloud.pid
+DESC="Autocloud service for Controller/Edge-device agents"
+test -x $DAEMON || exit 0
+echo $PROJECT_DIR$DAEMON_ARGS
+test -f $PROJECT_DIR$DAEMON_ARGS || exit 0
+
+case "$1" in
+start)
+  log_daemon_msg "Starting $DESC"
+
+  mkdir -p /run/autocloud/
+
+  start-stop-daemon --start --oknodo -b -C \
+      --output /var/log/autocloud.log \
+      --pidfile $PIDFILE --make-pidfile --chdir $PROJECT_DIR \
+      --exec $DAEMON $DAEMON_ARGS
+  ;;
+stop)
+  log_daemon_msg "Stopping $DESC"
+
+  start-stop-daemon --stop --quiet --oknodo \
+      --pidfile $PIDFILE --exec $DAEMON --remove-pidfile \
+      --retry 10
+  if [ "$?" -eq 0 ]; then
+    rm -f $PIDFILE
+  fi
+  log_end_msg 0
+  ;;
+restart)
+  shift
+  $0 stop ${@}
+  $0 start ${@}
+  ;;
+*)
+  echo "Usage: $0 {start|stop|restart}" >&2
+  exit 1
+  ;;
+esac
+
+exit 0
+
+# vim:set ai sts=2 sw=2 tw=0:
