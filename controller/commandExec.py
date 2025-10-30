@@ -8,7 +8,10 @@ class CommandExec():
     def __init__(self, settings: Settings = None):
         self.settings = settings
         self.msg = Messages()
-        self.line = Line_Tracking()
+        try:
+            self.line = Line_Tracking()
+        except Exception as e:
+            print("This edge device doesn't have an IoT")
         self.running = False
 
     def parse_command(self, data: dict):
